@@ -1,5 +1,7 @@
 ---
-title: "Lezione 1"
+title: "Esercizi"
+resource_files:
+  - data
 output: 
   learnr::tutorial: 
     language:
@@ -27,72 +29,190 @@ output:
 runtime: shiny_prerendered
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, echo=FALSE, message=FALSE}
 library(learnr)
+library(tidyverse)
 knitr::opts_chunk$set(echo = FALSE)
+posizione.stambecchi <- read.csv("data/posizioni_stambecchi.csv", sep="\t")
 ```
 
+## Introduzione
 
-## Parte  1
+In questo tutorial e negli esercizi imparerete:
 
-### Exercise 
+* a caricare una tabella in memoria
+* a identificare un elemento della tabella
+* a filtrare elementi della tabella
+* a creare grafici
 
-*Here's a simple exercise with an empty code chunk provided for entering the answer.*
+Per fare questo utilizzeremo un'insieme di pacchetti di R caricabili usando il comando
+`library(tidyverse)`
 
-R è un calcolatore semplice, digita 2+2 e lancia il codice:
+  
 
-```{r two-plus-two, exercise=TRUE}
+### Variabili e vettori
 
-```
+*Le variabili sono oggetti che memorizzano uno o più elementi.*
 
-### Exercise with Code
 
-*Here's an exercise with some prepopulated code as well as `exercise.lines = 5` to provide a bit more initial room to work.*
 
-Now write a function that adds any two numbers and then call it:
+Crea una variabile di classe "vettore" che contiene i nomi di tre vostri amici:
 
 ```{r add-function, exercise=TRUE, exercise.lines = 5}
-add <- function() {
-  
-}
+
+
 ```
 
-## Parte  2
+### Dataset utilizzato
 
-### Exercise with Hint
+Il dataset è commentato e disponibile per download in 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4661724.svg)](https://doi.org/10.5281/zenodo.4661724)
 
-*Here's an exercise where the chunk is pre-evaulated via the `exercise.eval` option (so the user can see the default output we'd like them to customize). We also add a "hint" to the correct solution via the chunk immediate below labeled `print-limit-hint`.*
+Il file è "posizioni_stambecchi.csv" ed è stato caricato come oggetto dal nome
+posizione.stambecchi con il comando
+`posizione.stambecchi <- read.csv("", sep="\t")`
 
-Modify the following code to limit the number of rows printed to 5:
+Scrivi il comando R che consente di visualizzare le ultime righe del dataset 
+posizione.stambecchi.
+```{r load-table, exercise = TRUE, exercise.eval = FALSE}
+ 
 
-```{r print-limit, exercise=TRUE, exercise.eval=TRUE}
-mtcars
 ```
 
-```{r print-limit-hint}
-head(mtcars)
+```{r load-table-solution}
+tail(posizione.stambecchi)
+```
+ 
+ 
+
+## Filtrare con il comando `filter()`
+
+### filter()
+
+`filter()` consente di inserire dei criteri per tenere o eliminare delle righe  del data frame in funzione di un criterio dettao dall'utente. 
+
+
+Utilizziamo `filter()` per selezionare solo gli stambecchi a quote minori di 2000 m:
+
+```{r filter1, exercise = TRUE, exercise.eval = FALSE}
+filter(posizione.stambecchi, height<2000)
 ```
 
-### Quiz
+Prova a modificare il comando per trovare quante posizioni sono sotto i 1800 m - dovresti trovarne 4.
 
-*You can include any number of single or multiple choice questions as a quiz. Use the `question` function to define a question and the `quiz` function for grouping multiple questions together.*
 
-Some questions to verify that you understand the purposes of various base and recommended R packages:
+###  output
 
-```{r quiz}
-quiz(
-  question("Which package contains functions for installing other R packages?",
-    answer("base"),
-    answer("tools"),
-    answer("utils", correct = TRUE),
-    answer("codetools")
+La funzione `filter()` restituisce un nuovo oggetto che è il risultato del filtro. 
+
+Se vuoi assegnare il risultato di `filter()` ad un oggetto, dovrai utilizzare l'operatore di assegnnazione, `<-`. 
+
+Utilizza il comando precedente ma assegna il risultato all'oggetto `stamb.bassa.quota`.
+
+```{r filter2, exercise = TRUE, exercise.eval = FALSE}
+filter(posizione.stambecchi, height<2000)
+```
+
+```{r filter2-solution}
+stamb.bassa.quota <- filter(posizione.stambecchi, height<2000)
+```
+ 
+
+### Test
+
+```{r quiz2, echo=FALSE}
+quiz(caption = "Quiz - Tabelle",
+  question("La classe di oggetti in R che riferisce ad una tabella come si chiama?",
+    answer("frame.data"),
+    answer("table"),
+    answer("data.frame", correct = TRUE, message = "R is free _and_ open source, which means that anyone can read, use, and copy the source code of the R language."),
+    answer("data.table"),
+    answer("frame"),
+    allow_retry = TRUE
   ),
-  question("Which of the R packages listed below are used to create plots?",
-    answer("lattice", correct = TRUE),
-    answer("tools"),
-    answer("stats"),
-    answer("grid", correct = TRUE)
+  question("Come si capisce la classe di un oggetto che abbiamo chiamato ogg?",
+    answer("lancio il comando class <- ogg"),
+    answer("lancio il comando class(ogg)", correct = TRUE, message = "bravo!"),
+    answer("lancio il comando class=ogg"),
+    answer("lancio il comando ogg(class)"),
+    allow_retry = TRUE
+  ),
+  question("How often should you update R?", type="multiple",
+    answer("Everytime you use it", message = "This will be too often unless you use R very rarely!"),
+    answer("About once a year", correct = TRUE, "A new version of R is released about once a year. Update sooner if you encounter a bug that you cannot explain."),
+    answer("Never", message = "A new version of R is released about once a year. I'll assume that you are using the newest version of R, which will be the fastest version with the fewest unexpected behaviors." ),
+    allow_retry = TRUE
   )
 )
 ```
 
+## Install RStudio
+
+### How to install RStudio
+
+RStudio is an Integrated Development Environment for R. What does that mean? Well, if you think of R as a language, which it is, you can think of RStudio as a program that helps you write and work in the language. RStudio makes programming in R much easier and I suggest that you use it!
+
+![](https://vimeo.com/203516968)
+
+### Test your knowledge
+
+```{r quiz3, echo=FALSE}
+quiz(caption = "Quiz - Installare RStudio",
+  question("RStudio IDE cosa è?",
+    answer("Un'interfaccia per utilizzare R.", correct = TRUE, message = "RStudio organizes your workspace and makes it easier to write, use, debug, and save R code. I highly recommend it and will rely on the RStudio IDE in several tutorials."),
+    answer("Un'interfaccia per non scrivere codice in R", message = "No, un po' di lavoro devi metterlo anche te, RStudio fornisce gli strumenti."),
+    answer("Un visualizzatore di dati come MS Excel."),
+    answer("E' la stessa cosa di R, solo un nome diverso", message = "R e RStudio sono due cose diverse. R è un linguaggio di programmazione, RStudio l'interfaccia per usarlo meglio. Come MS Word consente di creare documenti in lingua inglese, la lingua inglese e il programma MS Word sono due cose separate."),
+    allow_retry = TRUE
+  ),
+  question("RStudio è gratuito?",
+    answer("Si!", correct = TRUE, message = "Come R, RStudio è gratuito ed open-source. Ci sono versioni a pagamento ma non sono necessarie per l'utilizzo che ne faremo."),
+    answer("No.", message = "Come R, RStudio è gratuito ed open-source. Ci sono versioni a pagamento ma non sono necessarie per l'utilizzo che ne faremo.")
+  ),
+  question("Dove scarico RStudio?",
+    answer("www.rstudio.com/download", correct = TRUE, message = "Per i tutorial scaricare RStudio Desktop Open Source License."),
+    answer("[cloud.r-project.org](http://cloud.r-project.org)", message = "Qui scarichi R, non RStudio."),
+    answer("www.r-project.org"),
+    answer("[cran.rstudio.org](http://cran.rstudio.org)"),
+    allow_retry = TRUE
+  ),
+  question("Devo installare R se ho già RStudio?",
+    answer("Si.", correct = TRUE),
+    answer("No.", message = "R non è incluso con RStudio; devi installarlo separatamente.")
+  )
+)
+```
+
+## Install Packages
+
+### How to install R packages
+
+![](https://vimeo.com/203516241)
+
+### Test your knowledge
+
+```{r names, echo = FALSE}
+quiz(caption = "Quiz - Working with Packages",
+  question("What command do you use to install packages?",
+    answer("`library()`", message = "We will see what `library()` does later."),
+    answer("`install.packages()`", correct = TRUE),
+    answer("`install_packages()`"),
+    answer("There is no command. You must visit [cran.r-project.org](http://cran.r-project.org) and download packages manually.", message = "R makes it easy to download packages. You connect to the internet and then run one of the commands above."),
+    allow_retry = TRUE
+  ),
+  question("How often do you need to install a package on your computer?",
+    answer("Every time you restart R"),
+    answer("Every time you restart your computer"),
+    answer("Only once. Afterwards, R can find it on your hard drive as needed.", correct = TRUE),
+    answer("Never, as long as you are connected to the internet.", message = "This could be true if you are using R over a cloud service. However, if you are using R locally on your own computer, you will need to install each package that you use on your computer."),
+    allow_retry = TRUE
+  ),
+  question("What is the tidyverse?",
+    answer("A collection of packages that work well together and provide tools for common data science tasks.", correct = TRUE, message = 'You can install all of the tidyverse packages at once with `install.packages("tidyverse")`.'),
+    answer("A word processing program for R"),
+    answer("A code style that reads like poetry"),
+    answer("An alternate universe where everyone is an R programmer."),
+    allow_retry = TRUE
+  )
+)
+```
