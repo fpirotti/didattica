@@ -11,6 +11,7 @@ output:
           hint: "Suggerimenti"
           startover: "Ricomincia"
           continue: "Continua"
+          solution: "Soluzione"
           submitanswer: "Manda Risposta"
           previoustopic: "Sezione precedente"
           nexttopic: "Sezione successiva"
@@ -18,6 +19,7 @@ output:
           questiontryagain: "Ricomincia"
           copyclipboard: "Copia appunti"
         text:
+          
           startover: "Ricomincia"
           enginecap: "Codice R"
           areyousure: "Sicuro? (tutti gli esercizi si azzerano)"
@@ -25,8 +27,10 @@ output:
           exercise: "esercizio"
           exercise_plural: "esercizi"
           inthissection: "in questa sezione prima di continuare."          
-          
 runtime: shiny_prerendered
+editor_options: 
+  markdown: 
+    wrap: 52
 ---
 
 ```{r setup, include=FALSE, echo=FALSE, message=FALSE}
@@ -40,74 +44,339 @@ posizione.stambecchi <- read.csv("data/posizioni_stambecchi.csv", sep="\t")
 
 In questo tutorial e negli esercizi imparerete:
 
-* a caricare una tabella in memoria
-* a identificare un elemento della tabella
-* a filtrare elementi della tabella
-* a creare grafici
+-   a creare variabili con elementi, comprendere le
+    classi di oggetti
+-   a caricare una tabella in memoria
+-   a identificare un elemento della tabella
+-   a fare semplici statistiche
+-   a filtrare elementi della tabella
+-   inizierete a creare grafici
 
-Per fare questo utilizzeremo un'insieme di pacchetti di R caricabili usando il comando
+Per fare questo utilizzeremo un'insieme di pacchetti
+di R caricabili usando il comando
 `library(tidyverse)`
 
-  
+## Variabili
 
-### Variabili e vettori
+*Le variabili sono oggetti che memorizzano uno o più
+elementi.*
 
-*Le variabili sono oggetti che memorizzano uno o più elementi.*
+Se gli elementi sono più di uno, si dice un *vettore*. 
+Si utilizza l'operatore di assegnazione
+`<-` e il comando `c(` che concatena elementi per creare un vettore.
 
+NB: gli elementi dei vettori possono essere di un
+unico tipo (o classe), ovvero c(1,5,6) sarà un
+vettore numerico, c("a", "b", "c") un vettore di
+stringhe. Se create un vettore c(1,5,6, "A") R crea
+un vettore di classe stringa, non numerico, perchè i
+numeri possono essere convertiti in charatteri ma
+non tutti i caratteri sono convertibili in numeri.
+Provate voi stessi, vedrete che tutti i valori che hanno
+le doppie virgolette `"` intendendo che sono tutti
+elementi di classe "character".
 
-
-Crea una variabile di classe "vettore" che contiene i nomi di tre vostri amici:
-
-```{r add-function, exercise=TRUE, exercise.lines = 5}
-
+```{r vector, exercise=TRUE, exercise.lines = 5}
+# vettore di classe numeric
+c(11,5,3)
+# vettore di classe character
+c(5,6,7, "M")
 
 ```
 
-### Dataset utilizzato
+Potete chiedere direttamente ad R la classe di un
+oggetto usando il comando `class`. Provate a lanciare
+i comandi nelle righe sotto e poi a rilanciarle togliendo
+l'elemento "M"
 
-Il dataset è commentato e disponibile per download in 
+```{r vector-class, exercise=TRUE, exercise.lines = 5}
+ogg <- c(5,6,7, "M")
+class(ogg)
+
+```
+```{r vector-class-solution}
+ogg <- c(5,6,7)
+class(ogg)
+
+```
+
+Le classi di base in R sono:  
+
+* numeric (numeri e.g. 1.4, 2E3, 4  )
+* character (stringhe, ovvero testo)
+* boolean (vero o falso, definito con TRUE o FALSE)
+* POSIXlt e POSIXct che sono oggetti temporali (data e ora)
+
+
+Potete provare a trasformare una classe in un'altra
+usando il comando as.**** dove *=il nome della classe
+e.g.  `as.numeric()` 
+oppure `as.POSIXct()`, ovviamente devono essere compatibili le trasformazioni.
+
+```{r vector-convert, exercise=TRUE, exercise.lines = 5}
+ogg <- c(5,6,7, "M")
+as.numeric(ogg)
+
+```
+
+Ma come vedete quello che non riesce trasformare in
+numero diventa NA. NA significa "Not Available"
+ovvero non disponibile.
+
+Esercizio: crea una variabile chiamata "amici" che
+contiene i nomi di tre vostri amici:
+
+```{r add-function, exercise=TRUE, exercise.lines = 5, exercise.eval = FALSE }
+
+amici <- ???
+
+```
+
+```{r add-function-solution}
+
+amici <- c("Marco", "Anna", "Ginevra")
+
+```
+
+## Vettori, matrici e tabella (data.frame)
+
+Ogni elemento nel vettore ha un indice, ovvero la sua posizione.
+Il secondo elemento del vettore sotto è "Anna", prova a far girare 
+il codice sotto e poi prova a modificarlo  per vedere "Giorgio". 
+
+```{r vector-position, exercise=TRUE, exercise.lines = 5, exercise.eval = FALSE }
+
+amici <- c("Marco", "Anna", "Ginevra", "Giorgio")
+amici[[2]]
+
+```
+
+```{r vector-position-solution}
+
+amici[[4]]
+
+```
+Posso usare un vettore di interi per identificare più elementi, 
+ma in questo caso uso una singola parentesi quadra. Prova a far girare 
+il codice sotto e poi prova a modificarlo  per vedere "Anna", "Giorgio" e "Marco". 
+
+```{r vector-position2, exercise=TRUE, exercise.lines = 5, exercise.eval = FALSE }
+
+amici <- c("Marco", "Anna", "Ginevra", "Giorgio")
+amici[ c(1,3) ]
+
+```
+
+```{r vector-position2-solution}
+
+amici[ c(2,4,1) ]
+
+```
+### Le matrici (matrix)
+
+**NB** - un vettore è una **matrice (classe matrix)** in una singola dimensione, 
+mentre le matrici possono essere  multidimensionali. Prova a far girare 
+il codice sotto e poi rifallo girare modificando il valore dell'argomento
+`ncol` e sostituendo anche `nrow` in `ncol`.
+
+```{r matrix, exercise=TRUE, exercise.lines = 5, exercise.eval = FALSE }
+
+amici <- c("Marco", "Anna", "Ginevra")
+parenti <- c("Giovanni", "Piero", "Sofia")
+
+matrix( c(parenti, amici), ncol = 2 )
+
+```
+```{r matrix-solution}
+
+matrix( c(parenti, amici), ncol = 3 )
+matrix( c(parenti, amici), nrow = 2 )
+
+```
+
+Anche in questo caso possiamo identificare un valore
+usando un indice di posizione.  Nel codice sotto 
+`runif` crea 20 valori casuali di altezze tra 1 m e 50 cm e 2 metri.
+Dividiamo questi valori creando una matrice a due colonne e 
+accediamo all'altezza nella 5a riga e 2a colonna. 
+
+Prova ad accedere alla 8a riga e 1a colonna.
+
+
+```{r matrix2, exercise=TRUE, exercise.lines = 5, exercise.eval = FALSE }
+
+altezze <- runif(n=20, min=1.50, max=2.00) 
+altezza.matrice <- matrix( altezze, ncol = 2 )
+altezza.matrice[5, 2]
+mean(altezza.matrice)
+mean(altezza.matrice[,2])
+mean(altezza.matrice[,1])
+
+```
+
+```{r matrix2-solution}
+
+colnames(altezza.matrice)<-c("classe1", "classe2")
+altezza.matrice[8, 1]
+
+```
+
+### Oggetti data.frame
+
+Abbiamo appena visto una nuova classe, 
+la classe `matrix`. Questa classe può avere elementi di una unica 
+classe, ovvero tutti numerici o tutti caratteri, o tutti booleani.
+
+Una classe ancora più avanzata è la classe `data.frame`, 
+ovvero una tabella. Al contrario della classe `matrix`, la classe 
+`data.frame` può contenere colonne di tipo diverso. Attenzione, ogni colonna 
+è un vettore di un unico tipo, quindi una tabella può avere
+la colonna A di tipo/classe numerico (*numeric*) e la  
+colonna B di tipo/classe testo (*character*), ma all'interno della colonna
+gli elementi devono essere della stessa classe.
+
+Quasi tutti i dati che si analizzano sono in una struttura 
+regolare, quindi la classe `data.frame` è molto utilizzata.
+
+Solitamente i dati li abbiamo a
+disposizione in dei file di testo o in formato di foglio di 
+calcolo. Nella sezione successiva vedremo come caricarli.
+
+## Tabelle
+
+### Caricare una tabella da un file CSV
+
+Il dataset è commentato e disponibile per download
+in
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4661724.svg)](https://doi.org/10.5281/zenodo.4661724)
 
-Il file è "posizioni_stambecchi.csv" ed è stato caricato come oggetto dal nome
-posizione.stambecchi con il comando
-`posizione.stambecchi <- read.csv("", sep="\t")`
+Il file è "posizioni_stambecchi.csv" ed è stato
+caricato in questo tutorial come oggetto dal nome
+*posizione.stambecchi* con il comando
+`posizione.stambecchi <- read.csv("******", sep="\t")`
+dove gli asterischi indicano il percorso del file CSV.  
 
-Scrivi il comando R che consente di visualizzare le ultime righe del dataset 
-posizione.stambecchi.
-```{r load-table, exercise = TRUE, exercise.eval = FALSE}
- 
+Se state seguendo il tutorial con il vostro RStudio, caricate anche voi con il 
+comando sopra i dati di posizione.
+
+I comandi `head` e `tail` sono usati rispettivamente per vedere le prime ed
+ultime righe di un oggetto. Modifica il comando R sotto per  visualizzare le
+ultime righe del dataset `posizione.stambecchi`.
+
+```{r load-table, exercise = TRUE, exercise.eval = TRUE}
+head(posizione.stambecchi)
 
 ```
 
 ```{r load-table-solution}
 tail(posizione.stambecchi)
 ```
+
+### Righe e colonne
+
+Righe e colonne vengono identificate come per le matrici ovvero con 
+ `[ r, c ]`.
+
+I valori di qualsiasi colonna possono essere
+visualizzate anche usando uno dei due metodi
+sotto che sono equivalenti, ovvero  `$<nomecolonna>` o
+ `[ , "<nomecolonna>"]`.
  
+Prova a sostituire la colonna "height" con "collar_id"
+che fornisce l'ID del collare che identifica lo stambecco.
+
+```{r  stam-col, exercise = TRUE, exercise.eval = FALSE}
+posizione.stambecchi$height
+posizione.stambecchi[ , "height"]
+```
+```{r  stam-col-solution, echo = TRUE, eval = FALSE}
+posizione.stambecchi$collar_id
+#' OPPURE
+posizione.stambecchi[ , "collar_id"]
+```
+
+Con il comando "table" possiamo avere una tabella con il numero
+di elementi univoci in una data tabella.
+
+```{r  stam-col-tb, exercise = TRUE }
+table(posizione.stambecchi$collar_id)
+```
+
+## Il comando `which()`
+
+Come evidente dal risultato dell'ultima operazione della sezione precedente,
+`table()`,   i valori di collar_id 42 e 400 hanno solo una riga di informazioni e sono sicuramente errori di inserimento dati.
+
+Possiamo eliminarli in vari modi, quello di base è identificare il numero di riga dell'elemento trasformando il vettore della colonna "collar_id" in un vettore boleano semplicemente con 
+l'operatore == : `posizione.stambecchi$collar_id=="400"` - questo crea un vettore di dimensione identica al numero di righe con valori di vero/falso a seconda del risultato. Applicando `which()` su questo vettore, ci viene restituita la posizione dei valori TRUE.
+
+
+```{r  stam-col2, exercise = TRUE, exercise.eval = FALSE}
+tmp <- posizione.stambecchi$collar_id=="400"
+which(tmp)
+```
+
+Per valutare la posizione di ambedue i valori, possiamo usare 
+gli operatori logici "OPPURE" (OR) e "ANCHE" (AND) che in molti linguaggi di programmazione sono rispettivamente il carattere  `&` e `|` 
+In questo caso vogliamo le posizioni dove il vettore "collar_id" è uguale a 
+"400" OPPURE "42". Prova sotto e prova a trovare un modo per avere lo 
+stesso risultato in una singola riga:
+
+```{r  stam-col22,  exercise = TRUE, echo = TRUE, eval = FALSE}
+tmp1 <- posizione.stambecchi$collar_id=="400"
+tmp2 <- posizione.stambecchi$collar_id=="42"
+which(tmp1)
+which(tmp2)
+which(tmp1|tmp2)
+
+```
+```{r  stam-col22-solution, echo = TRUE, eval = FALSE}
+which(posizione.stambecchi$collar_id=="400" | 
+      posizione.stambecchi$collar_id=="42")
+
+```
+
+A questo punto eliminare queste righe è molto semplice:
+```{r  stam-col-which,  exercise = TRUE, echo = TRUE, eval = FALSE}
+posizioni <- which(posizione.stambecchi$collar_id=="400" | 
+      posizione.stambecchi$collar_id=="42")
+
+posizione.stambecchi.pulita <- posizione.stambecchi[ -posizioni, ]
+table(posizione.stambecchi.pulita )
+
+```
  
 
 ## Filtrare con il comando `filter()`
 
 ### filter()
 
-`filter()` consente di inserire dei criteri per tenere o eliminare delle righe  del data frame in funzione di un criterio dettao dall'utente. 
+`filter()` consente di inserire dei criteri per
+tenere o eliminare delle righe del data frame in
+funzione di un criterio dettao dall'utente.
 
-
-Utilizziamo `filter()` per selezionare solo gli stambecchi a quote minori di 2000 m:
+Utilizziamo `filter()` per selezionare solo gli
+stambecchi con collar_id maggiore di 8000 (ricordate 
+che il collar:
 
 ```{r filter1, exercise = TRUE, exercise.eval = FALSE}
 filter(posizione.stambecchi, height<2000)
 ```
 
-Prova a modificare il comando per trovare quante posizioni sono sotto i 1800 m - dovresti trovarne 4.
+Prova a modificare il comando per trovare quante
+posizioni sono sotto i 1800 m - dovresti trovarne 4.
 
+### output
 
-###  output
+La funzione `filter()` restituisce un nuovo oggetto
+che è il risultato del filtro.
 
-La funzione `filter()` restituisce un nuovo oggetto che è il risultato del filtro. 
+Se vuoi assegnare il risultato di `filter()` ad un
+oggetto, dovrai utilizzare l'operatore di
+assegnnazione, `<-`.
 
-Se vuoi assegnare il risultato di `filter()` ad un oggetto, dovrai utilizzare l'operatore di assegnnazione, `<-`. 
-
-Utilizza il comando precedente ma assegna il risultato all'oggetto `stamb.bassa.quota`.
+Utilizza il comando precedente ma assegna il
+risultato all'oggetto `stamb.bassa.quota`.
 
 ```{r filter2, exercise = TRUE, exercise.eval = FALSE}
 filter(posizione.stambecchi, height<2000)
@@ -116,9 +385,47 @@ filter(posizione.stambecchi, height<2000)
 ```{r filter2-solution}
 stamb.bassa.quota <- filter(posizione.stambecchi, height<2000)
 ```
- 
 
-### Test
+## Statistiche
+
+
+Volendo una semplice statistica come la media e la
+deviazione standard, basta usare i comandi giusti.
+
+```{r stats, echo = TRUE }
+mean(posizione.stambecchi$height)
+sd( posizione.stambecchi$height )
+```
+
+Attenzione che se ci sono dei valori NA (Not
+available) come NA o NaN molti comandi restituiscono
+NA a meno che non si specifica l'argomento na.rm
+=TRUE
+
+```{r stats2, echo = TRUE }
+#' aggiungo al vettore dei valori height, alcuni altri valori
+#' tra i quali NA e NaN, 100 m e 0 m (quota del mare)
+height.con.NA <- c(posizione.stambecchi$height, NA, 100, NaN, 0)
+mean( height.con.NA  )
+
+```
+
+Prova a modificare il comando "mean" aggiungendo
+l'argomento per ignorare/rimuovere gli NA dal
+vettore.
+
+```{r stats3, exercise = TRUE, exercise.eval = FALSE }
+
+mean( height.con.NA ???  )
+
+```
+
+```{r stats3-solution }
+mean( height.con.NA, na.rm=TRUE  )
+
+```
+
+## Test
 
 ```{r quiz2, echo=FALSE}
 quiz(caption = "Quiz - Tabelle",
@@ -137,81 +444,27 @@ quiz(caption = "Quiz - Tabelle",
     answer("lancio il comando ogg(class)"),
     allow_retry = TRUE
   ),
-  question("How often should you update R?", type="multiple",
-    answer("Everytime you use it", message = "This will be too often unless you use R very rarely!"),
-    answer("About once a year", correct = TRUE, "A new version of R is released about once a year. Update sooner if you encounter a bug that you cannot explain."),
-    answer("Never", message = "A new version of R is released about once a year. I'll assume that you are using the newest version of R, which will be the fastest version with the fewest unexpected behaviors." ),
-    allow_retry = TRUE
-  )
-)
-```
-
-## Install RStudio
-
-### How to install RStudio
-
-RStudio is an Integrated Development Environment for R. What does that mean? Well, if you think of R as a language, which it is, you can think of RStudio as a program that helps you write and work in the language. RStudio makes programming in R much easier and I suggest that you use it!
-
-![](https://vimeo.com/203516968)
-
-### Test your knowledge
-
-```{r quiz3, echo=FALSE}
-quiz(caption = "Quiz - Installare RStudio",
-  question("RStudio IDE cosa è?",
-    answer("Un'interfaccia per utilizzare R.", correct = TRUE, message = "RStudio organizes your workspace and makes it easier to write, use, debug, and save R code. I highly recommend it and will rely on the RStudio IDE in several tutorials."),
-    answer("Un'interfaccia per non scrivere codice in R", message = "No, un po' di lavoro devi metterlo anche te, RStudio fornisce gli strumenti."),
-    answer("Un visualizzatore di dati come MS Excel."),
-    answer("E' la stessa cosa di R, solo un nome diverso", message = "R e RStudio sono due cose diverse. R è un linguaggio di programmazione, RStudio l'interfaccia per usarlo meglio. Come MS Word consente di creare documenti in lingua inglese, la lingua inglese e il programma MS Word sono due cose separate."),
+  question("Se ho un vettore con 5 elementi, sulla variabile 'miovettore', come accedo al primo ed al terzo?",
+    answer("miovettore[[1,3]]", message="No! i due numeri vanno tra c() ed inoltre is usa la singola parentesi quadra"),
+    answer("miovettore[1,3]",  message = "No, i due numeri vanno tra c()... questo indice va a indicare di accedere alla prima riga e terza colonna di un oggeto matrice in 2D"),
+    answer("miovettore[c(1,3)]", correct = TRUE, message = "bravo!"),
+    answer("'miovettore'[c(1,3)]", message="Perchè le singole virgolette?"), 
     allow_retry = TRUE
   ),
-  question("RStudio è gratuito?",
-    answer("Si!", correct = TRUE, message = "Come R, RStudio è gratuito ed open-source. Ci sono versioni a pagamento ma non sono necessarie per l'utilizzo che ne faremo."),
-    answer("No.", message = "Come R, RStudio è gratuito ed open-source. Ci sono versioni a pagamento ma non sono necessarie per l'utilizzo che ne faremo.")
-  ),
-  question("Dove scarico RStudio?",
-    answer("www.rstudio.com/download", correct = TRUE, message = "Per i tutorial scaricare RStudio Desktop Open Source License."),
-    answer("[cloud.r-project.org](http://cloud.r-project.org)", message = "Qui scarichi R, non RStudio."),
-    answer("www.r-project.org"),
-    answer("[cran.rstudio.org](http://cran.rstudio.org)"),
+  question("Quale di queste è VERA rispetto alla classe <i>matrix</i>?",  
+    answer("Una matrice di valori ha 2 dimensioni non di più.", message = "Può avere qualsiasi dimensione, anche un cubo (3D)"),
+    answer("Una matrice può contenere valori numerici e valori testuali",  "No, solo un tipo di valore"),
+    answer("I comandi ncol e nrow mi danno rispettivamente il numero di colonne e di righe.", correct=TRUE ),
+    answer("Se voglio il valore alla seconda colonna e terza riga uso gli indici [2,3]", correct=FALSE, message="No! questo fornisce la seconda riga e terza colonna!!" ),
     allow_retry = TRUE
   ),
-  question("Devo installare R se ho già RStudio?",
-    answer("Si.", correct = TRUE),
-    answer("No.", message = "R non è incluso con RStudio; devi installarlo separatamente.")
-  )
-)
-```
-
-## Install Packages
-
-### How to install R packages
-
-![](https://vimeo.com/203516241)
-
-### Test your knowledge
-
-```{r names, echo = FALSE}
-quiz(caption = "Quiz - Working with Packages",
-  question("What command do you use to install packages?",
-    answer("`library()`", message = "We will see what `library()` does later."),
-    answer("`install.packages()`", correct = TRUE),
-    answer("`install_packages()`"),
-    answer("There is no command. You must visit [cran.r-project.org](http://cran.r-project.org) and download packages manually.", message = "R makes it easy to download packages. You connect to the internet and then run one of the commands above."),
-    allow_retry = TRUE
-  ),
-  question("How often do you need to install a package on your computer?",
-    answer("Every time you restart R"),
-    answer("Every time you restart your computer"),
-    answer("Only once. Afterwards, R can find it on your hard drive as needed.", correct = TRUE),
-    answer("Never, as long as you are connected to the internet.", message = "This could be true if you are using R over a cloud service. However, if you are using R locally on your own computer, you will need to install each package that you use on your computer."),
-    allow_retry = TRUE
-  ),
-  question("What is the tidyverse?",
-    answer("A collection of packages that work well together and provide tools for common data science tasks.", correct = TRUE, message = 'You can install all of the tidyverse packages at once with `install.packages("tidyverse")`.'),
-    answer("A word processing program for R"),
-    answer("A code style that reads like poetry"),
-    answer("An alternate universe where everyone is an R programmer."),
+  
+  
+  question("Che differenze c'è tra un oggetto di classi <i>matrix</i> ed uno <i>data.frame</i>?",
+    answer("Sono uguali"),
+    answer("Il data.frame può contenere colonne con classi diverse, la matrix no.", correct = TRUE, message = "bravo!"),
+    answer("Il data.frame può contenere colonne e righe con classi diverse, la matrix no.", message="No, ogni colonna deve avere una classe di oggetti"),
+    answer("lancio il comando ogg(class)"),
     allow_retry = TRUE
   )
 )
